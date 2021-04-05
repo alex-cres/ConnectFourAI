@@ -16,6 +16,8 @@ class ConnectGame:
         self.__TURN = 0
         self.__BOARD = self.__createBoard(self.__ROW_COUNT,self.__COLUMN_COUNT)
         self.__BOARD_STRING = ""
+    def __killGame(self):
+        self.__GAME_OVER=True
     def __nextTurn(self):
         self.__TURN += 1
         self.__TURN = self.__TURN % 2
@@ -45,14 +47,14 @@ class ConnectGame:
         return self.__BOARD
     def getFlippedBoard(self):
         return np.flip(self.__BOARD,0)
-    def initBoard(self,positions):
-        positions=[int(char) for char in positions]
+    def initBoard(self,positionsStr):
+        positions=[int(char) for char in positionsStr]
         self.__TURN = 0
         for i,move in enumerate(positions,start=1):
             result = self.tryDropPiece(move)
             if result:
                 if self.isWinningMove(self.__TURN+1):
-                    self.__GAME_OVER=True
+                    self.__killGame()
                     return [self.__TURN+1,i,positions[i:]]
                 self.__nextTurn()
         return []
@@ -77,14 +79,14 @@ class ConnectGame:
         #Negative Diagonals
         for c in range(self.__COLUMN_COUNT-(self.__CONNECT_NUMBER-1)):
             for r in range((self.__CONNECT_NUMBER-1),self.__ROW_COUNT):
-                if all(x == piece for x in self.__getDiagonal(self.__BOARD[r-(self.__CONNECT_NUMBER-1):r,c:c+self.__CONNECT_NUMBER],"-")):
+                if all(x == piece for x in self.__getDiagonal(self.__BOARD[r-(self.__CONNECT_NUMBER-1):r+1,c:c+self.__CONNECT_NUMBER],"-")):
                     return True
     def tryDropPiece(self,selected_col):
         if self.isValidLocation(selected_col):
-                row = self.__getNextOpenRow(selected_col)
-                self.__dropPiece(row,selected_col,self.__TURN+1)
-                self.__BOARD_STRING = self.__BOARD_STRING+str(selected_col)
-                return True
+            row = self.__getNextOpenRow(selected_col)
+            self.__dropPiece(row,selected_col,self.__TURN+1)
+            self.__BOARD_STRING = self.__BOARD_STRING+str(selected_col)
+            return True
         return False
     def getBoardString(self):
         return self.__BOARD_STRING
@@ -95,25 +97,23 @@ class ConnectGame:
         if initBoard == "y":
             initBoardStr = input("String based 0 for init:")
             result = self.initBoard(initBoardStr)
-            if self.__GAME_OVER:
-                print("PLAYER "+result[0]+" WINS!"," WINING MOVE : ",result[1] , "REMAIN : " , result[2])
+            if self.isGameOver():
+                self.printBoard()
+                print(self.getBoardString())
+                print("PLAYER "+str(result[0])+" WINS!"," WINING MOVE : ",result[1] , "REMAIN : " , result[2])
             else:
                 self.printBoard()
-                self.__BOARD_STRING=initBoard
-                print(self.__BOARD_STRING)
-        while not self.__GAME_OVER:
+                print(self.getBoardString())
+        while not self.isGameOver():
         #Ask Player n input
             selected_col = int(input("Player "+str(self.__TURN+1)+" Make your Selection (0-"+str(self.__COLUMN_COUNT-1)+"):"))
-
             result = self.tryDropPiece(selected_col)
-        
             self.printBoard()
-            print(self.__BOARD_STRING)
+            print(self.getBoardString())
             if result : 
-                if self.isWinningMove(self.__TURN+1):
-                    print("PLAYER "+str(self.__TURN+1)+" WINS!")
-                    self.__GAME_OVER=True
-                self.__nextTurn()
+                winner = self.concludePlay()
+                if winner != 0:
+                    print("PLAYER "+str(winner)+" WINS!")
             else:
                 print("Invalid input")
     def getColumnCount(self):
@@ -126,6 +126,12 @@ class ConnectGame:
         return len(self.__BOARD_STRING)
     def getTurn(self):
         return self.__TURN+1
+    def concludePlay(self):
+        if self.isWinningMove(self.__TURN+1):
+            self.__killGame()
+            return self.__TURN+1
+        self.__nextTurn()
+        return 0
 
 if __name__ == "__main__":
     game = ConnectGame()
