@@ -92,30 +92,6 @@ class ConnectGame:
         return self.__BOARD_STRING
     def isGameOver(self):
         return self.__GAME_OVER
-    def runConsoleGame(self):
-        initBoard = input("Init Board? (y/n):")
-        if initBoard == "y":
-            initBoardStr = input("String based 0 for init:")
-            result = self.initBoard(initBoardStr)
-            if self.isGameOver():
-                self.printBoard()
-                print(self.getBoardString())
-                print("PLAYER "+str(result[0])+" WINS!"," WINING MOVE : ",result[1] , "REMAIN : " , result[2])
-            else:
-                self.printBoard()
-                print(self.getBoardString())
-        while not self.isGameOver():
-        #Ask Player n input
-            selected_col = int(input("Player "+str(self.__TURN+1)+" Make your Selection (0-"+str(self.__COLUMN_COUNT-1)+"):"))
-            result = self.tryDropPiece(selected_col)
-            self.printBoard()
-            print(self.getBoardString())
-            if result : 
-                winner = self.concludePlay()
-                if winner != 0:
-                    print("PLAYER "+str(winner)+" WINS!")
-            else:
-                print("Invalid input")
     def getColumnCount(self):
         return self.__COLUMN_COUNT
     def getRowCount(self):
@@ -127,6 +103,10 @@ class ConnectGame:
     def getTurn(self):
         return self.__TURN+1
     def concludePlay(self):
+        """
+        Action to call after the turn is finished to verify if anyone won and to either end the game or pass to the next turn
+        Returns 0 is none won, 1/2 if that player won
+        """
         if self.isWinningMove(self.__TURN+1):
             self.__killGame()
             return self.__TURN+1
@@ -134,5 +114,8 @@ class ConnectGame:
         return 0
 
 if __name__ == "__main__":
-    game = ConnectGame()
+    import ConnectGameWithConsole as CGWC
+    game = CGWC.ConnectGameWithConsole()
     game.runConsoleGame()
+
+
