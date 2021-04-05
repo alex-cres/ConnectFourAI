@@ -37,12 +37,12 @@ class ConnectGameWithGUI:
         board = self.__GAME.getFlippedBoard()
         ss = self.__SQUARESIZE
         cp = self.__colorPalette
+        rad = self.__RADIUS
         for c in range(self.__COLUMN_COUNT):
             for r in range(self.__ROW_COUNT):
                 pygame.draw.rect(self.__SCREEN, self.boardColor, (c*ss, (r+1) * ss, ss, ss))
                 pygame.draw.circle(self.__SCREEN, cp[int(board[r][c])],
-                                   (int(c*ss + ss/2), int((r+1.5)*ss)),
-                                   self.__RADIUS)
+                                   (int(c*ss + ss/2), int((r+1.5)*ss)), rad)
             pygame.display.update()
 
     def runGUIGame(self):
