@@ -78,13 +78,13 @@ class ConnectGame:
         getDiagonal = self.__getDiagonal
         rowCount = self.__ROW_COUNT
 
-        # Check horizontal locations for win
+        # Horizontal
         for c in range(colCount-(conNum-1)):
             for r in range(rowCount):
                 if all(x == piece for x in board[r, c:c+conNum]):
                     return True
 
-        # Check vertical locations for win
+        # Vertical
         for c in range(colCount):
             for r in range(rowCount-(conNum-1)):
                 if all(x == piece for x in board[r:r+conNum, c]):
@@ -93,17 +93,13 @@ class ConnectGame:
         # Positive Diagonals
         for c in range(colCount-(conNum-1)):
             for r in range(rowCount-(conNum-1)):
-                if all(x == piece for x in getDiagonal(
-                                            board[r:r+conNum, c:c+conNum],
-                                            1)):
+                if all(x == piece for x in getDiagonal(board[r:r+conNum, c:c+conNum], 1)):
                     return True
 
         # Negative Diagonals
         for c in range(colCount-(conNum-1)):
             for r in range((conNum-1), rowCount):
-                if all(x == piece for x in getDiagonal(
-                                            board[r-conNum-1:r+1, c:c+conNum],
-                                            0)):
+                if all(x == piece for x in getDiagonal(board[r-conNum-1:r+1, c:c+conNum], 0)):
                     return True
 
     def tryDropPiece(self, selected_col):

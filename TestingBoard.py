@@ -6,8 +6,7 @@ class TestingBoard:
         game = CG.ConnectGame()
         result = game.initBoard(testMatrix[3])
         if game.isGameOver():
-            if result[0] != testMatrix[0] or \
-               result[1] != testMatrix[1] or \
+            if result[0] != testMatrix[0] or result[1] != testMatrix[1] or \
                "".join(str(i) for i in result[2]) != testMatrix[2]:
 
                 print("Test #", str(number), "failed - ",

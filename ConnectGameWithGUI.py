@@ -10,11 +10,7 @@ YELLOW = (255, 255, 0)
 
 
 class ConnectGameWithGUI:
-    def __init__(self,
-                 playerColors=[RED, YELLOW],
-                 boardColor=BLUE,
-                 row_count=6,
-                 column_count=7,
+    def __init__(self, playerColors=[RED, YELLOW], boardColor=BLUE, row_count=6, column_count=7,
                  connect_number=4):
         pygame.init()
         self.backGroundColor = BLACK
@@ -39,27 +35,13 @@ class ConnectGameWithGUI:
 
     def drawBoard(self):
         board = self.__GAME.getFlippedBoard()
+        ss = self.__SQUARESIZE
+        cp = self.__colorPalette
         for c in range(self.__COLUMN_COUNT):
             for r in range(self.__ROW_COUNT):
-                pygame.draw.rect(self.__SCREEN,
-                                 self.boardColor,
-                                 (
-                                    c*self.__SQUARESIZE,
-                                    r * self.__SQUARESIZE+self.__SQUARESIZE,
-                                    self.__SQUARESIZE, self.__SQUARESIZE
-                                 ))
-                pygame.draw.circle(self.__SCREEN,
-                                   self.__colorPalette[int(board[r][c])],
-                                   (
-                                       int(
-                                           c*self.__SQUARESIZE +
-                                           self.__SQUARESIZE/2
-                                           ),
-                                       int(
-                                           r*self.__SQUARESIZE +
-                                           self.__SQUARESIZE +
-                                           self.__SQUARESIZE/2)
-                                   ),
+                pygame.draw.rect(self.__SCREEN, self.boardColor, (c*ss, (r+1) * ss, ss, ss))
+                pygame.draw.circle(self.__SCREEN, cp[int(board[r][c])],
+                                   (int(c*ss + ss/2), int((r+1.5)*ss)),
                                    self.__RADIUS)
             pygame.display.update()
 
@@ -73,16 +55,13 @@ class ConnectGameWithGUI:
                 if event.type == pygame.MOUSEMOTION:
                     posx = event.pos[0]
                     turn = self.__GAME.getZeroBasedTurn()
-                    pygame.draw.circle(self.__SCREEN,
-                                       self.playerColors[turn],
-                                       (posx, int(self.__SQUARESIZE/2)),
-                                       self.__RADIUS)
+                    pygame.draw.circle(self.__SCREEN, self.playerColors[turn],
+                                       (posx, int(self.__SQUARESIZE/2)), self.__RADIUS)
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     selected_col = self.getColFromClickedPos(event.pos[0])
                     result = self.__GAME.tryDropPiece(selected_col)
-                    print(self.__GAME.getFlippedBoard(),
-                          self.__GAME.getBoardString())
+                    print(self.__GAME.getFlippedBoard(), self.__GAME.getBoardString())
                     self.drawBoard()
 
                     if result:
