@@ -3,7 +3,7 @@ import ConnectGame as CG
 class TestingBoard:
     def __init__(self,number,testMatrix):
         game=CG.ConnectGame()
-        result = game.initialize_board(testMatrix[3])
+        result = game.initializeBoard(testMatrix[3])
         if game.isGameOver():
             if result[0]!=testMatrix[0] or result[1]!=testMatrix[1] or "".join(str(i) for i in result[2])!=testMatrix[2]:
                 print("Test #",str(number),"failed - ",result," - ",testMatrix)
