@@ -1,60 +1,34 @@
+"""
+ConnectGame
+=====
+
+Provides the base for an ConnectGame
+"""
+
 import numpy as np
 
-
 class ConnectGame:
-    def __init__(self):
-        self.ROW_COUNT = 6
-        self.COLUMN_COUNT = 7
-        self.CONNECT_NUMBER = 4
-        self.GAME_OVER = False
-        self.TURN = 0
-        self.board = self.createBoard(self.ROW_COUNT,self.COLUMN_COUNT)
-        self.board_string=""
-    def runGame(self):
-        initBoard= input("Init Board? (y/n):")
-        if initBoard == "y":
-            initBoardStr = input("String based 0 for init:")
-            result=self.initializeBoard(initBoardStr)
-            if self.GAME_OVER:
-                print("PLAYER "+result[0]+" WINS!"," WINING MOVE : ",result[1] , "REMAIN : " , result[2])
-            else:
-                self.printBoard()
-                self.board_string=initBoard
-                print(self.board_string)
-        while not self.GAME_OVER:
-        #Ask Player n input
-            selected_col = int(input("Player "+str(self.TURN+1)+" Make your Selection (0-"+str(self.COLUMN_COUNT-1)+"):"))
-
-            if self.isValidLocation(selected_col):
-                row=self.getNextOpenRow(selected_col)
-                self.dropPiece(row,selected_col,self.TURN+1)
-                self.board_string=self.board_string+str(selected_col)
-        
-            self.printBoard()
-            print(self.board_string)
-            
-            if self.winningMove(self.TURN+1):
-                print("PLAYER "+str(self.TURN+1)+" WINS!")
-                self.GAME_OVER=True
-            
-            self.TURN += 1
-            self.TURN = self.TURN % 2
-    def isGameOver(self):
-        return self.GAME_OVER
-    def createBoard(self,height,width):
-        board = np.zeros((height,width))
-        return board
-    def dropPiece(self,row,col,piece):
-        self.board[row][col] = piece
-    def isValidLocation(self,col):
-        return self.board[len(self.board)-1][col]==0
-    def getNextOpenRow(self,col):
-        for row in range(len(self.board)):
-            if self.board[row][col]==0:
+    def __init__(self,row_count=6,column_count=7,connect_number=4):
+        self.__ROW_COUNT = row_count
+        self.__COLUMN_COUNT = column_count
+        self.__CONNECT_NUMBER = connect_number
+        self.__GAME_OVER = False
+        self.__TURN = 0
+        self.__BOARD = self.__createBoard(self.__ROW_COUNT,self.__COLUMN_COUNT)
+        self.__BOARD_STRING = ""
+    def __nextTurn(self):
+        self.__TURN += 1
+        self.__TURN = self.__TURN % 2
+    def __createBoard(self,height,width):
+        __BOARD = np.zeros((height,width))
+        return __BOARD
+    def __dropPiece(self,row,col,piece):
+        self.__BOARD[row][col] = piece
+    def __getNextOpenRow(self,col):
+        for row in range(len(self.__BOARD)):
+            if self.__BOARD[row][col]==0:
                 return row
-    def printBoard(self):
-        print(np.flip(self.board,0))
-    def getDiagonal(self,subBoard,t="+"):
+    def __getDiagonal(self,subBoard,t="+"):
         array = []
         if t == "+":
             for i in range(len(subBoard)):
@@ -63,47 +37,96 @@ class ConnectGame:
             for i in range(len(subBoard)):
                 array.append(subBoard[len(subBoard)-1-i][i]) 
         return array
-    def initializeBoard(self,positions):
+    def isValidLocation(self,col):
+        return self.__BOARD[len(self.__BOARD)-1][col]==0
+    def printBoard(self):
+        print(np.flip(self.__BOARD,0))
+    def getBoard(self):
+        return self.__BOARD
+    def getFlippedBoard(self):
+        return np.flip(self.__BOARD,0)
+    def initBoard(self,positions):
         positions=[int(char) for char in positions]
-        self.TURN = 0
+        self.__TURN = 0
         for i,move in enumerate(positions,start=1):
-            if self.isValidLocation(move):
-                row=self.getNextOpenRow(move)
-                self.dropPiece(row,move,self.TURN+1)
-                if self.winningMove(self.TURN+1):
-                    self.GAME_OVER=True
-                    return [self.TURN+1,i,positions[i:]]
-            self.TURN += 1
-            self.TURN = self.TURN % 2
+            result = self.tryDropPiece(move)
+            if result:
+                if self.isWinningMove(self.__TURN+1):
+                    self.__GAME_OVER=True
+                    return [self.__TURN+1,i,positions[i:]]
+                self.__nextTurn()
         return []
-    def winningMove(self,piece):
+    def isWinningMove(self,piece):
         #Check horizontal locations for win
-        for c in range(self.COLUMN_COUNT-(self.CONNECT_NUMBER-1)):
-            for r in range(self.ROW_COUNT):
-                #print("Horizontal:",r,c,board[r,c:c+CONNECT_NUMBER])
-                if all(x == piece for x in self.board[r,c:c+self.CONNECT_NUMBER]) :
+        for c in range(self.__COLUMN_COUNT-(self.__CONNECT_NUMBER-1)):
+            for r in range(self.__ROW_COUNT):
+                if all(x == piece for x in self.__BOARD[r,c:c+self.__CONNECT_NUMBER]) :
                     return True
         #Check vertical locations for win
-        for c in range(self.COLUMN_COUNT):
-            for r in range(self.ROW_COUNT-(self.CONNECT_NUMBER-1)):
-                #print("Vertical:",r,c,board[r:r+CONNECT_NUMBER,c])
-                if all(x == piece for x in self.board[r:r+self.CONNECT_NUMBER,c]) :
+        for c in range(self.__COLUMN_COUNT):
+            for r in range(self.__ROW_COUNT-(self.__CONNECT_NUMBER-1)):
+                if all(x == piece for x in self.__BOARD[r:r+self.__CONNECT_NUMBER,c]) :
                     return True
 
         #Positive Diagonals
-        for c in range(self.COLUMN_COUNT-(self.CONNECT_NUMBER-1)):
-            for r in range(self.ROW_COUNT-(self.CONNECT_NUMBER-1)):
-                #print("Diagonal Pos:",r,c,board[r:r+CONNECT_NUMBER,c:c+CONNECT_NUMBER],getDiagonal(board[r:r+CONNECT_NUMBER,c:c+CONNECT_NUMBER],"+"))
-                if all(x == piece for x in self.getDiagonal(self.board[r:r+self.CONNECT_NUMBER,c:c+self.CONNECT_NUMBER],"+")) :
+        for c in range(self.__COLUMN_COUNT-(self.__CONNECT_NUMBER-1)):
+            for r in range(self.__ROW_COUNT-(self.__CONNECT_NUMBER-1)):
+                if all(x == piece for x in self.__getDiagonal(self.__BOARD[r:r+self.__CONNECT_NUMBER,c:c+self.__CONNECT_NUMBER],"+")) :
                     return True
                 
         #Negative Diagonals
-        for c in range(self.COLUMN_COUNT-(self.CONNECT_NUMBER-1)):
-            for r in range((self.CONNECT_NUMBER-1),self.ROW_COUNT):
-                #print("Diagonal Neg:",r,c,board[r-(CONNECT_NUMBER-1):r+1,c:c+CONNECT_NUMBER],getDiagonal(board[r-(CONNECT_NUMBER-1):r+1,c:c+CONNECT_NUMBER],"-"))
-                if all(x == piece for x in self.getDiagonal(self.board[r-(self.CONNECT_NUMBER-1):r,c:c+self.CONNECT_NUMBER],"-")):
+        for c in range(self.__COLUMN_COUNT-(self.__CONNECT_NUMBER-1)):
+            for r in range((self.__CONNECT_NUMBER-1),self.__ROW_COUNT):
+                if all(x == piece for x in self.__getDiagonal(self.__BOARD[r-(self.__CONNECT_NUMBER-1):r,c:c+self.__CONNECT_NUMBER],"-")):
                     return True
+    def tryDropPiece(self,selected_col):
+        if self.isValidLocation(selected_col):
+                row = self.__getNextOpenRow(selected_col)
+                self.__dropPiece(row,selected_col,self.__TURN+1)
+                self.__BOARD_STRING = self.__BOARD_STRING+str(selected_col)
+                return True
+        return False
+    def getBoardString(self):
+        return self.__BOARD_STRING
+    def isGameOver(self):
+        return self.__GAME_OVER
+    def runConsoleGame(self):
+        initBoard = input("Init Board? (y/n):")
+        if initBoard == "y":
+            initBoardStr = input("String based 0 for init:")
+            result = self.initBoard(initBoardStr)
+            if self.__GAME_OVER:
+                print("PLAYER "+result[0]+" WINS!"," WINING MOVE : ",result[1] , "REMAIN : " , result[2])
+            else:
+                self.printBoard()
+                self.__BOARD_STRING=initBoard
+                print(self.__BOARD_STRING)
+        while not self.__GAME_OVER:
+        #Ask Player n input
+            selected_col = int(input("Player "+str(self.__TURN+1)+" Make your Selection (0-"+str(self.__COLUMN_COUNT-1)+"):"))
+
+            result = self.tryDropPiece(selected_col)
+        
+            self.printBoard()
+            print(self.__BOARD_STRING)
+            if result : 
+                if self.isWinningMove(self.__TURN+1):
+                    print("PLAYER "+str(self.__TURN+1)+" WINS!")
+                    self.__GAME_OVER=True
+                self.__nextTurn()
+            else:
+                print("Invalid input")
+    def getColumnCount(self):
+        return self.__COLUMN_COUNT
+    def getRowCount(self):
+        return self.__ROW_COUNT
+    def getConnectNumber(self):
+        return self.__CONNECT_NUMBER
+    def getTurnNumber(self):
+        return len(self.__BOARD_STRING)
+    def getTurn(self):
+        return self.__TURN+1
 
 if __name__ == "__main__":
-    game=ConnectGame()
-    game.runGame()
+    game = ConnectGame()
+    game.runConsoleGame()
