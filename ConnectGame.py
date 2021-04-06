@@ -99,7 +99,7 @@ class ConnectGame:
         # Negative Diagonals
         for c in range(colCount-(conNum-1)):
             for r in range((conNum-1), rowCount):
-                if all(x == piece for x in getDiagonal(board[r-conNum-1:r+1, c:c+conNum], 0)):
+                if all(x == piece for x in getDiagonal(board[r-(conNum-1):r+1, c:c+conNum], 0)):
                     return True
 
     def tryDropPiece(self, selected_col):
