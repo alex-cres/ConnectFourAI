@@ -13,7 +13,10 @@ class Eval:
         evalDict = dict(zip(unique, counts))
         turnEval = evalDict.get(turn) or 0
         otherEval = evalDict.get(other) or 0
-        evaluation += 2*turnEval + -(2*otherEval)
+        if otherEval != 0:
+            evaluation += -(2**otherEval)
+        if turnEval != 0:
+            evaluation += 2**turnEval
         return evaluation
 
 
