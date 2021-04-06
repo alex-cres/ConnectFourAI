@@ -102,6 +102,9 @@ class ConnectGame:
                 if all(x == piece for x in getDiagonal(board[r-(conNum-1):r+1, c:c+conNum], 0)):
                     return True
 
+    def getArraysForWinningMove(self):
+        pass
+
     def tryDropPiece(self, selected_col):
         if self.isValidLocation(selected_col):
             row = self.__getNextOpenRow(selected_col)
@@ -149,6 +152,48 @@ class ConnectGame:
 
     def isFirstPlayerTurn(self):
         return self.__TURN == 0
+
+
+class ConnectGameAI:
+    def __init__(self, board, turn=0, depth=3, row_count=6, column_count=7, connect_number=4):
+        self.__ROW_COUNT = row_count
+        self.__COLUMN_COUNT = column_count
+        self.__CONNECT_NUMBER = connect_number
+        self.__GAME_OVER = False
+        self.__TURN = turn
+        self.__BOARD = board
+        self.__BOARD_STRING = board.getBoardString()
+        self.__DEPTH = depth
+
+    def getNextPossibleMove(self, board_string):
+        subBoard = ConnectGame()
+        result = subBoard.initBoard(board_string)
+        if subBoard.isGameOver():
+            return [True, result[0]]
+        else:
+            possibleMoves = []
+            for c in range(self.__COLUMN_COUNT):
+                if subBoard.isValidLocation(c):
+                    possibleMoves.append(c)
+            return [False, possibleMoves]
+
+    def getBestMove(self, board_string, possibleMoves):
+        results = []
+        for i, c in enumerate(possibleMoves):
+            results.append(c)
+            pass
+
+    def analyseBoard(self, board_string, turn, move):
+        if turn != self.__TURN:
+            pass
+
+    def makeMove(self):
+        result = self.getNextPossibleMove(self.__BOARD_STRING)
+        if not result[0]:
+            bestCol = self.getBestMove(self.__BOARD_STRING, result[1])
+            selected_col = result[1][bestCol]
+            return selected_col
+        return None
 
 
 if __name__ == "__main__":
