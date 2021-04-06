@@ -10,6 +10,7 @@ import numpy as np
 
 class ConnectGame:
     def __init__(self, row_count=6, column_count=7, connect_number=4):
+        self.__WITH_ROBOT = False
         self.__ROW_COUNT = row_count
         self.__COLUMN_COUNT = column_count
         self.__CONNECT_NUMBER = connect_number
@@ -47,11 +48,18 @@ class ConnectGame:
                 array.append(subBoard[len(subBoard)-1-i][i])
         return array
 
+    def isSecondPlayerRobot(self):
+        return self.__WITH_ROBOT
+
+    def setSecondPlayerRobot(self):
+        self.__WITH_ROBOT = True
+
     def isValidLocation(self, col):
         return self.__BOARD[len(self.__BOARD)-1][col] == 0
 
     def printBoard(self):
         print(np.flip(self.__BOARD, 0))
+        print(self.getBoardString())
 
     def getBoard(self):
         return self.__BOARD
@@ -103,7 +111,35 @@ class ConnectGame:
                     return True
 
     def getArraysForWinningMove(self):
-        pass
+        conNum = self.__CONNECT_NUMBER
+        colCount = self.__COLUMN_COUNT
+        board = self.__BOARD
+        getDiagonal = self.__getDiagonal
+        rowCount = self.__ROW_COUNT
+        arrays = []
+        # Horizontal
+        for c in range(colCount-(conNum-1)):
+            for r in range(rowCount):
+                arrays.append([[r, r, c, c+conNum, 2], board[r, c:c+conNum]])
+
+        # Vertical
+        for c in range(colCount):
+            for r in range(rowCount-(conNum-1)):
+                arrays.append([[r, r+conNum, c, c, 2], board[r:r+conNum, c]])
+
+        # Positive Diagonals
+        for c in range(colCount-(conNum-1)):
+            for r in range(rowCount-(conNum-1)):
+                arrays.append([[r, r+conNum, c, c+conNum, 1],
+                              getDiagonal(board[r:r+conNum, c:c+conNum], 1)])
+
+        # Negative Diagonals
+        for c in range(colCount-(conNum-1)):
+            for r in range((conNum-1), rowCount):
+                arrays.append([[r-(conNum-1), r+1, c, c+conNum, 0],
+                              getDiagonal(board[r-(conNum-1):r+1, c:c+conNum], 0)])
+
+        return arrays
 
     def tryDropPiece(self, selected_col):
         if self.isValidLocation(selected_col):
@@ -152,48 +188,6 @@ class ConnectGame:
 
     def isFirstPlayerTurn(self):
         return self.__TURN == 0
-
-
-class ConnectGameAI:
-    def __init__(self, board, turn=0, depth=3, row_count=6, column_count=7, connect_number=4):
-        self.__ROW_COUNT = row_count
-        self.__COLUMN_COUNT = column_count
-        self.__CONNECT_NUMBER = connect_number
-        self.__GAME_OVER = False
-        self.__TURN = turn
-        self.__BOARD = board
-        self.__BOARD_STRING = board.getBoardString()
-        self.__DEPTH = depth
-
-    def getNextPossibleMove(self, board_string):
-        subBoard = ConnectGame()
-        result = subBoard.initBoard(board_string)
-        if subBoard.isGameOver():
-            return [True, result[0]]
-        else:
-            possibleMoves = []
-            for c in range(self.__COLUMN_COUNT):
-                if subBoard.isValidLocation(c):
-                    possibleMoves.append(c)
-            return [False, possibleMoves]
-
-    def getBestMove(self, board_string, possibleMoves):
-        results = []
-        for i, c in enumerate(possibleMoves):
-            results.append(c)
-            pass
-
-    def analyseBoard(self, board_string, turn, move):
-        if turn != self.__TURN:
-            pass
-
-    def makeMove(self):
-        result = self.getNextPossibleMove(self.__BOARD_STRING)
-        if not result[0]:
-            bestCol = self.getBestMove(self.__BOARD_STRING, result[1])
-            selected_col = result[1][bestCol]
-            return selected_col
-        return None
 
 
 if __name__ == "__main__":
