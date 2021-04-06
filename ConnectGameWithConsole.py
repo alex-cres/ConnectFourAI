@@ -10,8 +10,9 @@ class ConnectGameWithConsole:
     def runConsoleGame(self):
         withRobot = input("With AI (y/n):")
         if withRobot == "y":
+            depthNumber = input("Max Depth (number):")
             self.__GAME.setSecondPlayerRobot()
-            self.__ROBOT = CGAI.ConnectGameAI("", 1)
+            self.__ROBOT = CGAI.ConnectGameAI("", 1, int(depthNumber))
         initBoard = input("Init Board? (y/n):")
         if initBoard == "y":
             initBoardStr = input("String based 0 for init:")
